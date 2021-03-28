@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
 import {
   Button,
+  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {RNCamera} from 'react-native-camera';
@@ -31,11 +33,58 @@ const App = () => {
 
   return (
     <>
-      <ScrollView>
-        <SafeAreaView>
-          <Text style={styles.text}>I app devloper</Text>
-        </SafeAreaView>
-      </ScrollView>
+      <View style={styles.container}>
+        {image ? (
+          <View style={styles.preview}>
+            <Text style={styles.camtext}>Here is your new profile pic</Text>
+            <Image
+              style={styles.clicked}
+              source={{uri: image, width: '100%', height: '80%'}}
+            />
+            <Button
+              title="Click new Image"
+              onPress={() => {
+                setImage(null);
+              }}></Button>
+          </View>
+        ) : (
+          <RNCamera
+            style={styles.preview}
+            type={RNCamera.Constants.Type.back}
+            captureAudio={false}
+            flashMode={RNCamera.Constants.FlashMode.on}
+            androidCameraPermissionOptions={{
+              title: 'Premission to use Camera',
+              message: 'Longer text to use Camera',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+            androidRecordAudioPermissionOptions={{
+              title: 'Premission to use Mic',
+              message: 'Longer text to use Mic',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}>
+            {({camera, status}) => {
+              if (status !== 'READY') return <PendingView />;
+              return (
+                <View
+                  style={{
+                    flex: 0,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                  }}>
+                  <TouchableOpacity
+                    style={styles.capture}
+                    onPress={() => takePicture(camera)}>
+                    <Text>SNAP</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+          </RNCamera>
+        )}
+      </View>
     </>
   );
 };
@@ -43,8 +92,34 @@ const App = () => {
 export default App;
 
 const styles = new StyleSheet.create({
-  text: {
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    backgroundColor: '#0a79df',
+  },
+  preview: {
+    flex: 1,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  capture: {
+    flex: 0,
+    backgroundColor: 'orange',
+    padding: 20,
+    alignSelf: 'center',
+  },
+  camtext: {
+    backgroundColor: '#3498DB',
+    color: '#FFFFFF',
+    marginBottom: 10,
+    width: '100%',
+    textAlign: 'center',
+    paddingVertical: 25,
     fontSize: 25,
-    color: 'red',
+  },
+  clicked: {
+    width: 300,
+    height: 300,
+    borderRadius: 150,
   },
 });
